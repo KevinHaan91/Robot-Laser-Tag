@@ -1,0 +1,23 @@
+{
+  "name": "CyBots",
+  "version": "1.0.0",
+  "description": "Cybots App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "jsdoc": "^3.5.5",
+    "livecam": "latest",
+    "socket.io": "^2.0.3",
+    "sql": "latest"
+  },
+  "private": "true",
+  "dependencies": {
+    "d3-jetpack": "^2.0.15",
+    "d3-tip": "^0.7.1",
+    "express": "^4.16.0",
+    "mysql": "^2.15.0",
+    "tingle.js": "^0.12.0"
+  }
+}

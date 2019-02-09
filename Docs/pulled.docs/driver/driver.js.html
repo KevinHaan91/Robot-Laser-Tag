@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: driver.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: driver.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @gloabl
+ */
+ var socket_server = connectToUserSocket();
+
+if (getCookie("currentRobot") == "Cornelius"){
+  var robot_ip = "raspberrypi3-a.student.iastate.edu";
+}
+else {
+  var robot_ip = "monmodenic.student.iastate.edu";
+}
+var socket_robot = io(robot_ip + ":5210");
+
+//Redirect user as instructed by server
+socket_server.on('redirect', function(destination) {
+  window.location.href = destination;
+});
+
+
+//Reset user operator
+var obj = {'username':getCookie("username"), 'robotIndex':getCookie("robotIndex"), 'operatorType':getCookie("operatorType"), 'currentRobot':getCookie("currentRobot")};
+socket_server.emit('set user operator', obj);
+
+socket_server.emit("request-robotIP", getCookie("username"), function(){
+  alert("Requested robotIP");
+});
+
+socket_server.on("robotIP", function(data){
+  //robot_ip = data;
+  console.log("Got new robot ip " + data);
+});
+
+/** Chat Box
+ * On new message, append new div with message
+ */
+$(function () {
+  $('#msgform').submit(function(){
+    socket_server.emit('chat message driver', $('#m').val());
+    $('#m').val('');
+    return false;
+  });
+  socket_server.on('chat message', function(msg){
+    $('#messages').append($('&lt;li>&lt;strong>[' + msg.type + ']' + msg.username + ":&lt;/strong> " + msg.message + '&lt;/li>'));
+    var chatDiv = document.getElementById("chat-box");
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+  });
+});
+
+/**
+ * global
+ * @param {string} load - On load of the browser window
+ */
+window.addEventListener("load", function(){
+  
+  var buttonUpLeft = document.getElementById('buttonUpLeft');
+  var buttonUp = document.getElementById('buttonUp');
+  var buttonUpRight = document.getElementById('buttonUpRight');
+  var buttonLeft = document.getElementById('buttonLeft');
+  var buttonBoost = document.getElementById('buttonBoost');
+  var buttonRight = document.getElementById('buttonRight');
+  var buttonDownLeft = document.getElementById('buttonDownLeft');
+  var buttonDown = document.getElementById('buttonDown');
+  var buttonDownRight = document.getElementById('buttonDownRight');
+  var logout = document.getElementById('logout');
+  var lobby = document.getElementById('lobby');
+  
+  var health_container = document.getElementById('health_container');
+  var health_bar = document.getElementById('health_bar');
+  var health = 100;
+  
+  socket_robot.emit('request damage', function(){
+	  console.log('Requested damage');
+  });
+  
+  /**
+   * @global
+   * Check for now damage from robot and update health bar
+   */
+  socket_server.on('damage update', function(damage){
+    health = ((1500 - damage) / (1500));
+    health_bar.setAttribute('width', health + "%");
+  });
+  
+  /** up left */
+  buttonUpLeft.addEventListener('mousedown', function() {
+      console.log("q");
+      socket_robot.emit('Serial Movement', { dir: 'q'});
+  });
+  buttonUpLeft.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });
+  
+  /** up */ 
+  buttonUp.addEventListener('mousedown', function() {
+      console.log("w");
+      socket_robot.emit('Serial Movement', { dir: 'w'});
+  });
+  buttonUp.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });
+  
+  /** up right  */
+  buttonUpRight.addEventListener('mousedown', function() {
+      console.log("e");
+      socket_robot.emit('Serial Movement', { dir: 'e'});
+  });
+  buttonUpRight.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });
+  
+  
+  /** left */
+  buttonLeft.addEventListener('mousedown', function() {
+      console.log("a");
+      socket_robot.emit('Serial Movement', { dir: 'a'});
+  });
+  buttonLeft.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });
+  
+  /** boost */
+  buttonBoost.addEventListener('mousedown', function() {
+      console.log("+");
+      socket_robot.emit('Serial Movement', { dir: '+'});
+  });
+  buttonBoost.addEventListener('mouseup', function() {
+      console.log("0");
+      socket_robot.emit('Serial Movement', { dir: '0'});
+  });  
+
+
+  //right
+  buttonRight.addEventListener('mousedown', function() {
+      console.log("d");
+      socket_robot.emit('Serial Movement', { dir: 'd'});
+  });
+  buttonRight.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });  
+  
+ /** Down left */
+ buttonDownLeft.addEventListener('mousedown', function() {
+      console.log("z");
+      socket_robot.emit('Serial Movement', { dir: 'z'});
+  });
+  buttonDownLeft.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });
+  
+  /** Backwards */
+  buttonDown.addEventListener('mousedown', function() {
+      console.log("s");
+      socket_robot.emit('Serial Movement', { dir: 's'});
+  });
+  buttonDown.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });
+  
+  /** Down right */
+  buttonDownRight.addEventListener('mousedown', function() {
+      console.log("c");
+      socket_robot.emit('Serial Movement', { dir: 'c'});
+  });
+  buttonDownRight.addEventListener('mouseup', function() {
+      console.log("x");
+      socket_robot.emit('Serial Movement', { dir: 'x'});
+  });
+  
+  /**
+   * Set up new camera socket connection
+   * @param {string} robot_ip - IP address/hostname to connect to
+   * @param {string} webcam_port - Port number to connect to
+   * @ret {string} cam_socket - Camera Socket 
+   */
+  var webcam_port = "12000";
+  var webcam_host = $(".feed img");
+  var cam_socket = io.connect('http://' + robot_ip + ':' + webcam_port);
+  
+  if (robot_ip == "monmodenic.student.iastate.edu")
+	  document.getElementById('video').style.transform='scaleY(-1)';
+  else
+	  document.getElementById('video').style.transform='scaleY(1)';
+  /**
+   * On conneciton from the robot camera, tell user
+   * @param {string} socket - Camera socket
+   */  
+  cam_socket.on("connection", function(socket){
+    console.log("Connected to camera");
+  });
+  /** Rewrite camera source with new image form robot
+   * @param {string} data - base64 encoded image from robot camera
+   */
+  cam_socket.on('image', function (data) {
+    webcam_host.attr("src", "data:image/jpeg;base64," + data );
+  });
+    
+
+  logout.addEventListener('mouseup', function(){
+    console.log("Logging out...");
+    window.location.href = 'http://proj-309-rb-b-2.cs.iastate.edu:3000/';
+  });
+
+  lobby.addEventListener('mouseup', function(){
+    console.log("Redirecting back to lobby");
+    window.location.href = 'http://proj-309-rb-b-2.cs.iastate.edu:3000/lobby';
+  });
+
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#socket_server">socket_server</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Dec 12 2017 15:44:11 GMT-0600 (CST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
