@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<meta content="utf-8" http-equiv="encoding">
+		
+		<script type="text/javascript" src="http://proj-309-rb-b-2.cs.iastate.edu:3000/socket.io.js"></script>
+		<style>
+		
+			body {
+				background-color: #0070C0;
+				font-family: Trebuchet MS;
+			}
+			
+			#wrapper2 {
+				border: 3px solid #f1f1f1;
+				background-color: #E0E0E0;
+			}
+
+			#wrapper {
+				max-width: 1170px;
+				margin: auto;
+			}
+			
+			a {
+				color: #000000;
+				text-decoration: none;
+			}
+
+			a:hover 
+			{
+				 color:#00A0C6; 
+				 text-decoration:none; 
+				 cursor:pointer;  
+			}
+
+			input[type=text], input[type=password] {
+				width: 100%;
+				padding: 12px 20px;
+				margin: 8px 0;
+				display: inline-block;
+				border: 1px solid #ccc;
+				box-sizing: border-box;
+			}
+
+			button:hover {
+				opacity: 0.8;
+			}
+
+			.cancelbtn {
+				width: auto;
+				padding: 10px 18px;
+				background-color: #f44336;
+			}
+
+			.imgcontainer {
+				text-align: center;
+				margin: 24px 0 12px 0;
+			}
+
+			img.avatar {
+				max-height: 200px;
+				border-radius: 50%;
+			}
+
+			.container {
+				padding: 16px;
+			}
+
+			span.psw {
+				float: right;
+				padding-top: 16px;
+			}
+			
+			.box {
+				width: 44%;
+				height: 550px;
+				margin: 1em;
+				border: 5px solid black;
+				vertical-align: top;
+				padding: 10px;
+				background-color:#F0F0F0;
+				display:inline-block;
+				text-align:left;
+			}
+			
+			.button {
+				background-color: #0070C0;
+				border: none;
+				color: white;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				cursor: pointer;
+				margin: 15px;
+				width: 210px;
+			}
+			
+			/* The Modal (background) */
+			.modal {
+				display: none; /* Hidden by default */
+				position: fixed; /* Stay in place */
+				z-index: 1; /* Sit on top */
+				padding-top: 100px; /* Location of the box */
+				left: 0;
+				top: 0;
+				width: 100%; /* Full width */
+				height: 100%; /* Full height */
+				overflow: auto; /* Enable scroll if needed */
+				background-color: rgb(0,0,0); /* Fallback color */
+				background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+			}
+
+			/* Modal Content */
+			.modal-content {
+				background-color: #fefefe;
+				margin: auto;
+				padding: 20px;
+				border: 1px solid #888;
+				width: 20%;
+			}
+
+			/* The Close Button */
+			.close {
+				color: #aaaaaa;
+				float: right;
+				font-size: 28px;
+				font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #000;
+				text-decoration: none;
+				cursor: pointer;
+			}
+				
+			
+		</style>
+	</head>
+	
+	<body>
+
+		<div id="wrapper">
+			<div id='wrapper2'>
+				<h1 style="padding-left:15px; display:inline-block; font-size:40px">Profile</h1>
+				<h3 style="display:inline-block; float:right; padding:25px 15px 0 0;"><strong>Online Status:</strong> <span id='onlineStatus'></span></h3>
+				<div id='profilePic' class="imgcontainer">
+					<img src="http://proj-309-rb-b-2.cs.iastate.edu:3000/avatars/default.jpg" class='avatar' alt="Profile Image"/>
+				</div>
+				
+				<div style="text-align:center;">
+					<div class='box'>
+						<u><h2 id='username' style="text-align:center"></h2></u>
+						<p style="font-size:20px"><strong>Display Name:</strong> <span id='displayName'></span> <span id='displayNameButton'></span></p>
+						<p style="font-size:20px"><strong>Bio:</strong> <span id='bio'></span> <span id='bioButton'><button onclick="editBio();">Edit</button></span></p>
+					</div>
+					
+					<div class='box'>
+						<u><h2 id='friends' style="text-align:center">Friends</h2></u>
+						<div id='friendsList' style="font-size:20px;"></div>
+					</div>
+					
+					<div style="text-align:center">
+						<button type="button" class="button" onclick="returnHome();">Return</button>
+						<button type="button" class="button" onclick="viewProfile();">View Profile</button>
+						<span id="profilePicButton"><button type="button" class="button" onclick="openModal();">Change Profile Pic</button></span>
+						<span id="addFriendButton"></span>
+						<button type="button" class="button" onclick="logout();" style="background-color:red">Logout</button>
+					</div>
+				</div>
+				
+				<!-- The Modal -->
+				<div id="myModal" class="modal">
+
+				  <!-- Modal content -->
+				  <div class="modal-content" style="text-align:center">
+					<span class="close">&times;</span>
+					<h2>Upload New Profile Picture</h2>
+					<input type="file" id="newProfilePic" accept="image/*"><br/><br/>
+					<button type="button" class="button" onclick = "uploadProfilePic();">Upload!</button>
+					
+					<div style="display:none";>
+						<form id="profileForm" action="/profile" method="post">
+							<input type="text" name="id" id="id">
+							<input type="text" name="pic" id="pic">
+							<input type="submit" value="Submit">
+						</form>
+					</div>
+				  </div>
+
+				</div>
+				
+			</div>
+		</div>
+	</body>
+	
+	<footer>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+		<script type="text/javascript" src="http://proj-309-rb-b-2.cs.iastate.edu:3000/cookies.js"></script>
+		<script type="text/javascript" src="http://proj-309-rb-b-2.cs.iastate.edu:3000/profile.js"></script>
+	</footer>
+	
+</html>
