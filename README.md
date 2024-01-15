@@ -1,4 +1,6 @@
-# This is the README. This will be updated with stuff from the wiki soon.
+# *Had to pull this from a teammate, because I couldn't find the code on my laptop anymore.
+
+This is the README. This will be updated with stuff from the wiki soon. 
 
 Dependencies for Object Detection:
 * protobuf-compiler (arch: protobuf-c)
